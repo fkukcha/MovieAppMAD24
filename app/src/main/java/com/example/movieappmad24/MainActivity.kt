@@ -58,11 +58,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.onPrimary
                 ) {
-                    Column {
-                        TopAppBar(title = "Movie App")
-                        MovieList(movies = getMovies(), modifier = Modifier.weight(1f))
-                        BottomNavigationBar()
-                    }
+                    MovieAppContent()
                 }
             }
         }
@@ -70,106 +66,16 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MovieList(movies: List<Movie> = getMovies(), modifier: Modifier = Modifier){
-    LazyColumn(modifier = modifier) {
-        items(movies) { movie ->
-            MovieRow(movie)
-        }
-    }
-}
-
-
-@Composable
-fun MovieRow(movie: Movie){
-    var showDetails by remember {
-        mutableStateOf(false)
-    }
-
-    val painter: Painter = rememberImagePainter(
-        data = movie.images.first(),
-        builder = {
-            crossfade(true)
-        }
-    )
-
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(5.dp),
-        shape = ShapeDefaults.Large,
-        elevation = CardDefaults.cardElevation(10.dp)
-    ) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .height(150.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painter,
-                    contentScale = ContentScale.Crop,
-                    contentDescription = "Movie Image")
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp),
-                    contentAlignment = Alignment.TopEnd
-                ){
-                    Icon(
-                        tint = MaterialTheme.colorScheme.secondary,
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = "Add to favorites")
-                }
-            }
-            
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = movie.title)
-                Icon(modifier = Modifier
-                    .clickable {
-                       showDetails = !showDetails
-                    },
-                    imageVector =
-                        if (showDetails) Icons.Filled.KeyboardArrowDown
-                        else Icons.Default.KeyboardArrowUp, contentDescription = "show more")
-            }
-
-            AnimatedVisibility(visible = showDetails) {
-                Column(modifier = Modifier.padding(6.dp)) {
-                    Text(text = "Director: ${movie.director}")
-                    Text(text = "Release: ${movie.year}")
-                    Text(text = "Genre: ${movie.genre}")
-                    Text(text = "Actors: ${movie.actors}")
-                    Text(text = "Rating: ${movie.rating}")
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color.Gray))
-                    Text(text = "Plot: ${movie.plot}")
-                }
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun DefaultPreview(){
-    MovieAppMAD24Theme {
-       MovieList(movies = getMovies())
+fun MovieAppContent() {
+    Column {
+        TopAppBar(title = "Movie App")
+        MovieList(movies = getMovies(), modifier = Modifier.weight(1f))
+        BottomNavigationBar()
     }
 }
 
 @Composable
-fun TopAppBar(
-    title: String,
-    modifier: Modifier = Modifier
-) {
+fun TopAppBar(title: String, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier
             .fillMaxWidth()
@@ -190,6 +96,123 @@ fun TopAppBar(
             )
         }
     }
+}
+
+@Composable
+fun MovieList(modifier: Modifier = Modifier, movies: List<Movie> = getMovies()){
+    LazyColumn(modifier = modifier) {
+        items(movies) { movie ->
+            MovieRow(movie)
+        }
+    }
+}
+
+@Composable
+fun MovieRow(movie: Movie){
+    var showDetails by remember { mutableStateOf(false) }
+
+    val painter: Painter = rememberImagePainter(
+        data = movie.images.first(),
+        builder = {
+            crossfade(true)
+        }
+    )
+
+    MovieCard(movie = movie, painter = painter, showDetails = showDetails, onShowDetailsChange = { showDetails = it })
+}
+
+@Composable
+fun MovieCard(movie: Movie, painter: Painter, showDetails: Boolean, onShowDetailsChange: (Boolean) -> Unit) {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .padding(5.dp),
+        shape = ShapeDefaults.Large,
+        elevation = CardDefaults.cardElevation(10.dp)
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .height(150.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                MovieImage(painter = painter)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    contentAlignment = Alignment.TopEnd
+                ){
+                    FavoriteIcon()
+                }
+            }
+
+            MovieHeader(movie = movie, showDetails = showDetails, onShowDetailsChange = onShowDetailsChange)
+
+            MovieDetailsVisibility(movie = movie, showDetails = showDetails)
+        }
+    }
+}
+
+@Composable
+fun MovieHeader(movie: Movie, showDetails: Boolean, onShowDetailsChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = movie.title)
+        Icon(modifier = Modifier
+            .clickable {
+                onShowDetailsChange(!showDetails)
+            },
+            imageVector =
+            if (showDetails) Icons.Filled.KeyboardArrowDown
+            else Icons.Default.KeyboardArrowUp, contentDescription = "show more")
+    }
+}
+
+@Composable
+fun MovieDetailsVisibility(movie: Movie, showDetails: Boolean) {
+    AnimatedVisibility(visible = showDetails) {
+        MovieDetails(movie = movie)
+    }
+}
+
+@Composable
+fun MovieImage(painter: Painter) {
+    Image(
+        painter = painter,
+        contentScale = ContentScale.Crop,
+        contentDescription = "Movie Image"
+    )
+}
+
+@Composable
+fun MovieDetails(movie: Movie) {
+    Column(modifier = Modifier.padding(6.dp)) {
+        Text(text = "Director: ${movie.director}")
+        Text(text = "Release: ${movie.year}")
+        Text(text = "Genre: ${movie.genre}")
+        Text(text = "Actors: ${movie.actors}")
+        Text(text = "Rating: ${movie.rating}")
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(1.dp)
+            .background(Color.Gray))
+        Text(text = "Plot: ${movie.plot}")
+    }
+}
+
+@Composable
+fun FavoriteIcon() {
+    Icon(
+        tint = MaterialTheme.colorScheme.secondary,
+        imageVector = Icons.Default.FavoriteBorder,
+        contentDescription = "Add to favorites"
+    )
 }
 
 @Composable
@@ -228,5 +251,13 @@ fun NavigationBarItem(label: String, icon: ImageVector) {
             text = label,
             style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.secondary)
         )
+    }
+}
+
+@Preview
+@Composable
+fun DefaultPreview(){
+    MovieAppMAD24Theme {
+        MovieList(movies = getMovies())
     }
 }
