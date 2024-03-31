@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
-import com.example.movieappmad24.BottomNavigationBar
 import com.example.movieappmad24.MovieRow
 import com.example.movieappmad24.TopAppBar
 import com.example.movieappmad24.models.Movie
@@ -22,6 +21,5 @@ fun WatchlistScreen(onMovieClick: (Movie) -> Unit) {
                 MovieRow(movie = movie, onMovieClick = onMovieClick)
             }
         }
-        BottomNavigationBar(navController)
     }
 }

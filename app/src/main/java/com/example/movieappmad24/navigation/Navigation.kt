@@ -1,12 +1,14 @@
 package com.example.movieappmad24.navigation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -30,11 +32,11 @@ fun Navigation() {
         movieClicked = currentDestination?.destination?.route != Screen.MovieList.route
     }
 
-    Column {
+    Column(modifier = Modifier.fillMaxSize()) {
         if (!movieClicked) {
             TopAppBar(title = "Movie App")
         }
-        NavHost(navController = navController, startDestination = Screen.MovieList.route) {
+        NavHost(navController = navController, startDestination = Screen.MovieList.route, modifier = Modifier.weight(1f)) {
             composable(Screen.MovieList.route) {
                 MovieList(movies = getMovies(), onMovieClick = { movie ->
                     movieClicked = true
