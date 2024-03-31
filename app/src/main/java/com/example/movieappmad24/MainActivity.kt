@@ -47,12 +47,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.example.movieappmad24.models.Movie
 import com.example.movieappmad24.models.getMovies
+import com.example.movieappmad24.navigation.Navigation
 import com.example.movieappmad24.ui.theme.MovieAppMAD24Theme
 
 class MainActivity : ComponentActivity() {
@@ -65,7 +63,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.onPrimary
                 ) {
-                    AppNavigator()
+                    Navigation()
                 }
             }
         }
@@ -256,12 +254,35 @@ fun NavigationBarItem(label: String, icon: ImageVector) {
 @Composable
 fun DetailScreen(movie: Movie, onBack: () -> Unit) {
     Column {
-        IconButton(onClick = { onBack() }) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .background(color = Color(0xFFF4E6FF))
+        ) {
+            IconButton(onClick = { onBack() }) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.primary)
+            }
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                color = MaterialTheme.colorScheme.primary
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .background(color = Color(0xFFF4E6FF))
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = movie.title,
+                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+                }
+            }
         }
-        TopAppBar(
-            title = movie.title
-        )
         MovieRow(movie, onMovieClick={})
         LazyRow {
             items(movie.images) { image ->
@@ -283,37 +304,6 @@ fun DetailScreen(movie: Movie, onBack: () -> Unit) {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun AppNavigator() {
-    val navController = rememberNavController()
-    var movieClicked by remember { mutableStateOf(false) }
-
-    Column {
-        if (!movieClicked) {
-            TopAppBar(title = "Movie App")
-        }
-        NavHost(navController = navController, startDestination = "movieList") {
-            composable("movieList") {
-                MovieList(movies = getMovies(), onMovieClick = { movie ->
-                    movieClicked = true
-                    navController.navigate("movieDetail/${movie.id}")
-                })
-            }
-            composable("movieDetail/{movieId}") { backStackEntry ->
-                val movieId = backStackEntry.arguments?.getString("movieId")
-                val movie = getMovies().find { it.id == movieId }
-                if (movie != null) {
-                    DetailScreen(movie = movie, onBack = {
-                        movieClicked = false
-                        navController.popBackStack()
-                    })
-                }
-            }
-        }
-        BottomNavigationBar()
     }
 }
 
