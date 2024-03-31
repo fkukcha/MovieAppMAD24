@@ -1,5 +1,7 @@
 package com.example.movieappmad24.navigation
 
+import SimpleBottomAppBar
+import SimpleTopAppBar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -13,11 +15,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.movieappmad24.BottomNavigationBar
-import com.example.movieappmad24.DetailScreen
-import com.example.movieappmad24.MovieList
-import com.example.movieappmad24.TopAppBar
 import com.example.movieappmad24.models.getMovies
+import com.example.movieappmad24.ui.screens.DetailScreen
+import com.example.movieappmad24.ui.screens.MovieList
+import com.example.movieappmad24.ui.screens.WatchlistScreen
 
 @Composable
 fun Navigation() {
@@ -34,7 +35,7 @@ fun Navigation() {
 
     Column(modifier = Modifier.fillMaxSize()) {
         if (!movieClicked) {
-            TopAppBar(title = "Movie App")
+            SimpleTopAppBar(title = "Movie App")
         }
         NavHost(navController = navController, startDestination = Screen.MovieList.route, modifier = Modifier.weight(1f)) {
             composable(Screen.MovieList.route) {
@@ -60,6 +61,6 @@ fun Navigation() {
                 })
             }
         }
-        BottomNavigationBar(navController)
+        SimpleBottomAppBar(navController)
     }
 }
