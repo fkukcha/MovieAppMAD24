@@ -15,9 +15,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -26,6 +29,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
@@ -43,6 +47,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.example.movieappmad24.models.Movie
 import com.example.movieappmad24.models.getMovies
@@ -58,19 +65,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.onPrimary
                 ) {
-                    MovieAppContent()
+                    AppNavigator()
                 }
             }
         }
-    }
-}
-
-@Composable
-fun MovieAppContent() {
-    Column {
-        TopAppBar(title = "Movie App")
-        MovieList(movies = getMovies(), modifier = Modifier.weight(1f))
-        BottomNavigationBar()
     }
 }
 
@@ -99,16 +97,16 @@ fun TopAppBar(title: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun MovieList(modifier: Modifier = Modifier, movies: List<Movie> = getMovies()){
+fun MovieList(modifier: Modifier = Modifier, movies: List<Movie> = getMovies(), onMovieClick: (Movie) -> Unit){
     LazyColumn(modifier = modifier) {
         items(movies) { movie ->
-            MovieRow(movie)
+            MovieRow(movie, onMovieClick)
         }
     }
 }
 
 @Composable
-fun MovieRow(movie: Movie){
+fun MovieRow(movie: Movie, onMovieClick: (Movie) -> Unit){
     var showDetails by remember { mutableStateOf(false) }
 
     val painter: Painter = rememberImagePainter(
@@ -118,14 +116,15 @@ fun MovieRow(movie: Movie){
         }
     )
 
-    MovieCard(movie = movie, painter = painter, showDetails = showDetails, onShowDetailsChange = { showDetails = it })
+    MovieCard(movie = movie, painter = painter, showDetails = showDetails, onShowDetailsChange = { showDetails = it }, onMovieClick = onMovieClick)
 }
 
 @Composable
-fun MovieCard(movie: Movie, painter: Painter, showDetails: Boolean, onShowDetailsChange: (Boolean) -> Unit) {
+fun MovieCard(movie: Movie, painter: Painter, showDetails: Boolean, onShowDetailsChange: (Boolean) -> Unit, onMovieClick: (Movie) -> Unit) {
     Card(modifier = Modifier
         .fillMaxWidth()
-        .padding(5.dp),
+        .padding(5.dp)
+        .clickable { onMovieClick(movie) },
         shape = ShapeDefaults.Large,
         elevation = CardDefaults.cardElevation(10.dp)
     ) {
@@ -254,10 +253,74 @@ fun NavigationBarItem(label: String, icon: ImageVector) {
     }
 }
 
+@Composable
+fun DetailScreen(movie: Movie, onBack: () -> Unit) {
+    Column {
+        IconButton(onClick = { onBack() }) {
+            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+        }
+        TopAppBar(
+            title = movie.title
+        )
+        MovieRow(movie, onMovieClick={})
+        LazyRow {
+            items(movie.images) { image ->
+                Card(
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .size(150.dp),
+                    shape = ShapeDefaults.Large,
+                    elevation = CardDefaults.cardElevation(10.dp)
+                ) {
+                    Image(
+                        painter = rememberImagePainter(
+                            data = image,
+                            builder = { crossfade(true) }
+                        ),
+                        contentDescription = "Movie Image",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AppNavigator() {
+    val navController = rememberNavController()
+    var movieClicked by remember { mutableStateOf(false) }
+
+    Column {
+        if (!movieClicked) {
+            TopAppBar(title = "Movie App")
+        }
+        NavHost(navController = navController, startDestination = "movieList") {
+            composable("movieList") {
+                MovieList(movies = getMovies(), onMovieClick = { movie ->
+                    movieClicked = true
+                    navController.navigate("movieDetail/${movie.id}")
+                })
+            }
+            composable("movieDetail/{movieId}") { backStackEntry ->
+                val movieId = backStackEntry.arguments?.getString("movieId")
+                val movie = getMovies().find { it.id == movieId }
+                if (movie != null) {
+                    DetailScreen(movie = movie, onBack = {
+                        movieClicked = false
+                        navController.popBackStack()
+                    })
+                }
+            }
+        }
+        BottomNavigationBar()
+    }
+}
+
 @Preview
 @Composable
 fun DefaultPreview(){
     MovieAppMAD24Theme {
-        MovieList(movies = getMovies())
+        MovieList(movies = getMovies(), onMovieClick = {})
     }
 }
