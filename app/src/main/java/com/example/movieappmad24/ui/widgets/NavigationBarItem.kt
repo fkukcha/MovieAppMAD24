@@ -19,7 +19,7 @@ fun NavigationBarItem(label: String, icon: ImageVector, isSelected: Boolean, onC
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onBackground
+            tint = if (isSelected) MaterialTheme.colorScheme.outlineVariant else MaterialTheme.colorScheme.onBackground
         )
         Text(
             text = label,
