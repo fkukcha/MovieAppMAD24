@@ -47,10 +47,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.rememberImagePainter
 import com.example.movieappmad24.models.Movie
 import com.example.movieappmad24.models.getMovies
 import com.example.movieappmad24.navigation.Navigation
+import com.example.movieappmad24.navigation.Screen
 import com.example.movieappmad24.ui.theme.MovieAppMAD24Theme
 
 class MainActivity : ComponentActivity() {
@@ -213,7 +216,9 @@ fun FavoriteIcon() {
 }
 
 @Composable
-fun BottomNavigationBar() {
+fun BottomNavigationBar(navController: NavController) {
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -227,26 +232,31 @@ fun BottomNavigationBar() {
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            NavigationBarItem(label = "Home", icon = Icons.Default.Home)
-            NavigationBarItem(label = "Watchlist", icon = Icons.Default.Star)
+            NavigationBarItem(label = "Home", icon = Icons.Default.Home, isSelected = currentRoute == Screen.MovieList.route) {
+                navController.navigate(Screen.MovieList.route)
+            }
+            NavigationBarItem(label = "Watchlist", icon = Icons.Default.Star, isSelected = currentRoute == Screen.Watchlist.route) {
+                navController.navigate(Screen.Watchlist.route)
+            }
         }
     }
 }
 
 @Composable
-fun NavigationBarItem(label: String, icon: ImageVector) {
+fun NavigationBarItem(label: String, icon: ImageVector, isSelected: Boolean, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.clickable(onClick = onClick)
     ) {
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = MaterialTheme.colorScheme.secondary
+            tint = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onBackground
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.secondary)
+            style = MaterialTheme.typography.bodySmall.copy(color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onBackground)
         )
     }
 }

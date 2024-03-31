@@ -7,4 +7,5 @@ sealed class Screen(val route: String) {
             return route.replace("{movieId}", movieId)
         }
     }
+    object Watchlist : Screen("watchlist")
 }
