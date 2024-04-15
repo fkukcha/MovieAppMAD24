@@ -1,11 +1,13 @@
 package com.example.movieappmad24.navigation
 
+import MovieViewModel
 import SimpleBottomAppBar
 import SimpleTopAppBar
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,7 +23,7 @@ import com.example.movieappmad24.ui.screens.MovieList
 import com.example.movieappmad24.ui.screens.WatchlistScreen
 
 @Composable
-fun Navigation() {
+fun Navigation(viewModel: MovieViewModel) {
     val navController = rememberNavController()
     var movieClicked by remember { mutableStateOf(false) }
 
@@ -33,29 +35,34 @@ fun Navigation() {
         movieClicked = currentDestination?.destination?.route != Screen.MovieList.route
     }
 
+    // Get the list of favorite movies from the ViewModel
+    val favoriteMovies by viewModel.favoriteMovies.collectAsState()
+
     Column(modifier = Modifier.fillMaxSize()) {
         if (!movieClicked) {
             SimpleTopAppBar(title = "Movie App")
         }
         NavHost(navController = navController, startDestination = Screen.MovieList.route, modifier = Modifier.weight(1f)) {
             composable(Screen.MovieList.route) {
-                MovieList(movies = getMovies(), onMovieClick = { movie ->
+                MovieList(movies = getMovies(), favoriteMovies = favoriteMovies, onMovieClick = { movie ->
                     movieClicked = true
                     navController.navigate(Screen.MovieDetail.withArgs(movie.id))
+                }, onFavoriteClick = { movie ->
+                    viewModel.toggleFavorite(movie)
                 })
             }
             composable(Screen.MovieDetail.route) { backStackEntry ->
                 val movieId = backStackEntry.arguments?.getString("movieId")
                 val movie = getMovies().find { it.id == movieId }
                 if (movie != null) {
-                    DetailScreen(movie = movie, onBack = {
+                    DetailScreen(movie = movie, viewModel = viewModel, onBack = {
                         movieClicked = false
                         navController.popBackStack()
                     })
                 }
             }
             composable(Screen.Watchlist.route) {
-                WatchlistScreen(onMovieClick = { movie ->
+                WatchlistScreen(viewModel = viewModel, onMovieClick = { movie ->
                     movieClicked = true
                     navController.navigate(Screen.MovieDetail.withArgs(movie.id))
                 })

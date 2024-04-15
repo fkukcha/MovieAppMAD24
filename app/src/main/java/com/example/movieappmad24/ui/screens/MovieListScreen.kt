@@ -15,13 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,16 +41,16 @@ import com.example.movieappmad24.models.Movie
 import com.example.movieappmad24.models.getMovies
 
 @Composable
-fun MovieList(modifier: Modifier = Modifier, movies: List<Movie> = getMovies(), onMovieClick: (Movie) -> Unit){
+fun MovieList(modifier: Modifier = Modifier, movies: List<Movie> = getMovies(), favoriteMovies: List<Movie>, onMovieClick: (Movie) -> Unit, onFavoriteClick: (Movie) -> Unit){
     LazyColumn(modifier = modifier) {
         items(movies) { movie ->
-            MovieRow(movie, onMovieClick)
+            MovieRow(movie, favoriteMovies, onMovieClick, onFavoriteClick)
         }
     }
 }
 
 @Composable
-fun MovieRow(movie: Movie, onMovieClick: (Movie) -> Unit){
+fun MovieRow(movie: Movie, favoriteMovies: List<Movie>, onMovieClick: (Movie) -> Unit, onFavoriteClick: (Movie) -> Unit) {
     var showDetails by remember { mutableStateOf(false) }
 
     val painter: Painter = rememberImagePainter(
@@ -59,11 +60,11 @@ fun MovieRow(movie: Movie, onMovieClick: (Movie) -> Unit){
         }
     )
 
-    MovieCard(movie = movie, painter = painter, showDetails = showDetails, onShowDetailsChange = { showDetails = it }, onMovieClick = onMovieClick)
+    MovieCard(movie = movie, favoriteMovies = favoriteMovies, painter = painter, showDetails = showDetails, onShowDetailsChange = { showDetails = it }, onMovieClick = onMovieClick, onFavoriteClick = onFavoriteClick)
 }
 
 @Composable
-fun MovieCard(movie: Movie, painter: Painter, showDetails: Boolean, onShowDetailsChange: (Boolean) -> Unit, onMovieClick: (Movie) -> Unit) {
+fun MovieCard(movie: Movie, favoriteMovies: List<Movie>, painter: Painter, showDetails: Boolean, onShowDetailsChange: (Boolean) -> Unit, onMovieClick: (Movie) -> Unit, onFavoriteClick: (Movie) -> Unit){
     Card(modifier = Modifier
         .fillMaxWidth()
         .padding(5.dp)
@@ -85,7 +86,7 @@ fun MovieCard(movie: Movie, painter: Painter, showDetails: Boolean, onShowDetail
                         .padding(10.dp),
                     contentAlignment = Alignment.TopEnd
                 ){
-                    FavoriteIcon()
+                    FavoriteIcon(movie = movie, favoriteMovies = favoriteMovies, onFavoriteClick = onFavoriteClick)
                 }
             }
 
@@ -149,10 +150,23 @@ fun MovieDetails(movie: Movie) {
 }
 
 @Composable
-fun FavoriteIcon() {
-    Icon(
-        tint = MaterialTheme.colorScheme.secondary,
-        imageVector = Icons.Default.FavoriteBorder,
-        contentDescription = "Add to favorites"
-    )
+fun FavoriteIcon(movie: Movie, favoriteMovies: List<Movie>, onFavoriteClick: (Movie) -> Unit) {
+    IconToggleButton(
+        checked = movie in favoriteMovies,
+        onCheckedChange = { onFavoriteClick(movie) }
+    ) {
+        if (movie in favoriteMovies) {
+            Icon(
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "Favorite",
+                tint = Color.Red
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = "Favorite",
+                tint = Color.Red
+            )
+        }
+    }
 }

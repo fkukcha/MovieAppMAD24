@@ -1,5 +1,6 @@
 package com.example.movieappmad24.ui.screens
 
+import MovieViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,8 @@ import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,7 +34,7 @@ import coil.compose.rememberImagePainter
 import com.example.movieappmad24.models.Movie
 
 @Composable
-fun DetailScreen(movie: Movie, onBack: () -> Unit) {
+fun DetailScreen(movie: Movie, viewModel: MovieViewModel, onBack: () -> Unit) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -62,7 +65,8 @@ fun DetailScreen(movie: Movie, onBack: () -> Unit) {
                 }
             }
         }
-        MovieRow(movie, onMovieClick={})
+        val favoriteMovies by viewModel.favoriteMovies.collectAsState()
+        MovieRow(movie, favoriteMovies = favoriteMovies, onMovieClick={}, onFavoriteClick = { viewModel.toggleFavorite(it) })
         LazyRow {
             items(movie.images) { image ->
                 Card(

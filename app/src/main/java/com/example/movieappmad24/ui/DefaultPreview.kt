@@ -8,6 +8,6 @@ import com.example.movieappmad24.ui.theme.MovieAppMAD24Theme
 @Composable
 fun DefaultPreview(){
     MovieAppMAD24Theme {
-        MovieList(movies = getMovies(), onMovieClick = {})
+        MovieList(movies = getMovies(), favoriteMovies = listOf(), onMovieClick = {}, onFavoriteClick = {})
     }
 }
