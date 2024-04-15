@@ -1,5 +1,6 @@
 package com.example.movieappmad24.ui.screens
 
+import MovieTrailerPlayer
 import MovieViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.example.movieappmad24.models.Movie
@@ -67,6 +69,9 @@ fun DetailScreen(movie: Movie, viewModel: MovieViewModel, onBack: () -> Unit) {
         }
         val favoriteMovies by viewModel.favoriteMovies.collectAsState()
         MovieRow(movie, favoriteMovies = favoriteMovies, onMovieClick={}, onFavoriteClick = { viewModel.toggleFavorite(it) })
+
+        MovieTrailerPlayer(LocalContext.current, movie)
+
         LazyRow {
             items(movie.images) { image ->
                 Card(
