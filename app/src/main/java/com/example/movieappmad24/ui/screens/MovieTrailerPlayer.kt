@@ -12,14 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.movieappmad24.models.Movie
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.PlayerView
 
 @Composable
 fun MovieTrailerPlayer(context: Context, movie: Movie) {
     val exoPlayer = remember {
-        SimpleExoPlayer.Builder(context).build()
+        ExoPlayer.Builder(context).build()
     }
 
     val rawResId = context.resources.getIdentifier(
