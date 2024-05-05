@@ -53,6 +53,7 @@ fun Navigation(
             composable(Screen.MovieList.route) {
                 MovieListScreen(
                     viewModel = movieListViewModel,
+                    detailViewModel = MovieDetailViewModel(repository, ""),
                     onMovieClick = { movie ->
                         movieClicked = true
                         navController.navigate(Screen.MovieDetail.withArgs(movie.id))

@@ -4,6 +4,7 @@ import com.example.movieappmad24.data.MovieRepository
 import com.example.movieappmad24.models.getMovies
 import com.example.movieappmad24.ui.screens.MovieListScreen
 import com.example.movieappmad24.ui.theme.MovieAppMAD24Theme
+import com.example.movieappmad24.viewmodels.MovieDetailViewModel
 import com.example.movieappmad24.viewmodels.MovieListViewModel
 
 @Preview
@@ -19,9 +20,10 @@ fun DefaultPreview() {
 
     MovieAppMAD24Theme {
         MovieListScreen(
-            viewModel = simpleViewModel, // Pass the ViewModel to the screen
-            onMovieClick = {}, // Empty click handler for preview
-            onFavoriteClick = {} // Empty favorite handler for preview
+            viewModel = simpleViewModel,
+            detailViewModel = MovieDetailViewModel(repository, ""),
+            onMovieClick = {},
+            onFavoriteClick = {}
         )
     }
 }
