@@ -43,22 +43,6 @@ import com.example.movieappmad24.ui.screens.detailscreen.DetailScreen
 import com.example.movieappmad24.viewmodels.MovieDetailViewModel
 import com.example.movieappmad24.viewmodels.MovieListViewModel
 
-//@Composable
-//fun MovieListScreen(viewModel: MovieListViewModel, onMovieClick: (Movie) -> Unit, onFavoriteClick: (Movie) -> Unit) {
-//    val movies by viewModel.movies.collectAsState()
-//    val favoriteMovies by viewModel.favoriteMovies.collectAsState()
-//    val selectedMovie = remember { mutableStateOf<Movie?>(null) }
-//
-//    MovieAppMAD24Theme {
-//        LazyColumn(modifier = Modifier.fillMaxSize()) {
-//            items(movies) { movie ->
-//                // MovieRow(movie = movie, favoriteMovies = favoriteMovies, onMovieClick = onMovieClick, onFavoriteClick = onFavoriteClick)
-//                MovieRow(movie = movie, favoriteMovies = favoriteMovies, onMovieClick = { selectedMovie.value = it }, onFavoriteClick = { viewModel.toggleFavorite(it) })
-//            }
-//        }
-//    }
-//}
-
 @Composable
 fun MovieListScreen(
     viewModel: MovieListViewModel,
