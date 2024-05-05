@@ -26,6 +26,7 @@ import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,13 +39,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.example.movieappmad24.models.Movie
-import com.example.movieappmad24.models.getMovies
+import com.example.movieappmad24.ui.theme.MovieAppMAD24Theme
+import com.example.movieappmad24.viewmodels.MovieListViewModel
 
 @Composable
-fun MovieList(modifier: Modifier = Modifier, movies: List<Movie> = getMovies(), favoriteMovies: List<Movie>, onMovieClick: (Movie) -> Unit, onFavoriteClick: (Movie) -> Unit){
-    LazyColumn(modifier = modifier) {
-        items(movies) { movie ->
-            MovieRow(movie, favoriteMovies, onMovieClick, onFavoriteClick)
+fun MovieListScreen(viewModel: MovieListViewModel, onMovieClick: (Movie) -> Unit, onFavoriteClick: (Movie) -> Unit) {
+    val movies by viewModel.movies.collectAsState()
+    val favoriteMovies by viewModel.favoriteMovies.collectAsState()
+
+    MovieAppMAD24Theme {
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(movies) { movie ->
+                MovieRow(movie = movie, favoriteMovies = favoriteMovies, onMovieClick = onMovieClick, onFavoriteClick = onFavoriteClick)
+            }
         }
     }
 }

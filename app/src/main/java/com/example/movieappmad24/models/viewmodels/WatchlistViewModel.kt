@@ -1,23 +1,14 @@
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.movieappmad24.models.Movie
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+package com.example.movieappmad24.viewmodels
 
-class WatchlistViewModel : ViewModel() {
-    private val _favoriteMovies = MutableStateFlow<List<Movie>>(emptyList())
-    val favoriteMovies: StateFlow<List<Movie>> = _favoriteMovies
+import androidx.lifecycle.ViewModel
+import com.example.movieappmad24.data.MovieRepository
+import com.example.movieappmad24.models.Movie
+import kotlinx.coroutines.flow.StateFlow
+
+class WatchlistViewModel(private val repository: MovieRepository) : ViewModel() {
+    val favoriteMovies: StateFlow<List<Movie>> = repository.favoriteMovies
 
     fun toggleFavorite(movie: Movie) {
-        viewModelScope.launch {
-            val currentFavorites = _favoriteMovies.value.toMutableList()
-            if (currentFavorites.contains(movie)) {
-                currentFavorites.remove(movie)
-            } else {
-                currentFavorites.add(movie)
-            }
-            _favoriteMovies.emit(currentFavorites)
-        }
+        repository.toggleFavorite(movie)
     }
 }

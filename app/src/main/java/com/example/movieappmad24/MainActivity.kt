@@ -1,40 +1,33 @@
 package com.example.movieappmad24
 
-import MovieListViewModel
 import MovieListViewModelFactory
-import MovieViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
-import com.example.movieappmad24.models.MovieRepository
+import com.example.movieappmad24.data.MovieRepository
 import com.example.movieappmad24.navigation.Navigation
 import com.example.movieappmad24.ui.theme.MovieAppMAD24Theme
+import com.example.movieappmad24.viewmodels.MovieListViewModel
 
 class MainActivity : ComponentActivity() {
-    private lateinit var viewModel: MovieListViewModel
+    private val repository = MovieRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val repository = MovieRepository() // Replace this with your actual repository instance
-        val viewModelFactory = MovieListViewModelFactory(repository)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MovieListViewModel::class.java)
-
         setContent {
             MovieAppMAD24Theme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    val viewModel: MovieViewModel by viewModels()
-                    Navigation(viewModel)
+                    val viewModelFactory = MovieListViewModelFactory(repository)
+                    val movieListViewModel = ViewModelProvider(this, viewModelFactory).get(MovieListViewModel::class.java)
+                    Navigation(movieListViewModel, repository)
                 }
             }
         }

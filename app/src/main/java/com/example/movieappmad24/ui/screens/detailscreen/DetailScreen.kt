@@ -1,7 +1,6 @@
-package com.example.movieappmad24.ui.screens
+package com.example.movieappmad24.ui.screens.detailscreen
 
 import MovieTrailerPlayer
-import MovieViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,9 +33,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.example.movieappmad24.models.Movie
+import com.example.movieappmad24.ui.screens.MovieRow
+import com.example.movieappmad24.viewmodels.MovieDetailViewModel
 
 @Composable
-fun DetailScreen(movie: Movie, viewModel: MovieViewModel, onBack: () -> Unit) {
+fun DetailScreen(movie: Movie, viewModel: MovieDetailViewModel, onBack: () -> Unit) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
